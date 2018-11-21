@@ -1,10 +1,30 @@
 import React from "react"
+import TemperatureInput from "./TemperatureInput";
+import BoilingVerdict from "./BolingVerdict"
 
 const testStyle = {
   marginTop:"20px auto",
   display:"block"
 }
 
+
+function toCelsius(fahrenheit){
+  return (fahrenheit - 32) * 5 / 9;
+}
+
+function toFahrenheit(celsius){
+  return (celsius * 9 / 5) + 32;
+}
+
+function tryConvert(temperature, convert){
+  const input = parseInt(temperature);
+  if(Number.isNaN(input)){
+    return '';
+  }
+  const output = convert(input);
+  const rounded = Math.round(output * 1000) / 1000;
+  return rounded.toString();
+}
 
 const numbers = [1, 2, 3, 4, 5];
 
@@ -13,7 +33,9 @@ class TestPanel extends React.Component{
     super(props);
     this.state = {
       date: (new Date()).getTime(),
-      value: ""
+      value: "",
+      scale: 'c',
+      temperature: ''
     };
     this.tick = this.tick.bind(this);
     this.listItems = numbers.map((number) => 
@@ -22,6 +44,8 @@ class TestPanel extends React.Component{
     this.handleClick = this.handleClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCelsiusChange = this.handleCelsiusChange.bind(this);
+    this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this);
   }
   tick(){
     this.setState({
@@ -42,6 +66,15 @@ class TestPanel extends React.Component{
     alert("A name is submitted: "+this.state.value);
     e.preventDefault();
   }
+
+  handleCelsiusChange(temperature) {
+    this.setState({scale: 'c', temperature});
+  }
+
+  handleFahrenheitChange(temperature) {
+    this.setState({scale: 'f', temperature});
+  }
+
   componentDidMount(){
     this.timer = setInterval(() => this.tick(), 1000)
   }
@@ -49,20 +82,24 @@ class TestPanel extends React.Component{
     clearInterval(this.timer)
   }
   render(){
-    return (
-      <div  style={testStyle}>
-        { this.props.content }
-        时间是：{ this.state.date }
-        <ul>
-          {this.listItems}
-        </ul>
-        <form onSubmit = {(e) => this.handleSubmit(e)}>
-          <label>
-            Name: <input type="text" value={this.state.value} onChange={ this.handleChange}/>
-          </label>
-          <input type = "submit" value = "Submit"/>
-        </form>
+    const scale = this.state.scale;
+    const temperature = this.state.temperature;
+    const celsius = scale === 'f' ? tryConvert(temperature, toCelsius) : temperature;
+    const fahrenheit = scale === 'c' ? tryConvert(temperature, toFahrenheit) : temperature;
 
+    return (
+      <div>
+        <TemperatureInput
+          scale = 'c'
+          temperature = {celsius}
+          onTemperatureChange = {this.handleCelsiusChange}/>
+        <TemperatureInput
+          scale="f"
+          temperature={fahrenheit}
+          onTemperatureChange={this.handleFahrenheitChange} />
+
+        <BoilingVerdict
+          celsius={parseFloat(celsius)} />
       </div>
     )
   }

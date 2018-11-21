@@ -9,6 +9,7 @@ import Contact from "./components/Contact"
 import NotFound from "./components/NotFound"
 import Navigation from "./components/Navigation"
 import TestPanel from "./components/Test"
+import Calculator from "./components/Calculator"
 
 import UserForm from "./components/UserForm"
 
@@ -45,6 +46,7 @@ class App extends Component {
             ? <p>Msg of state is: {this.state.repos}</p>
             : <p>Please enter your own name</p>}
           <TestPanel content = "i am test panel"/>
+          <Calculator />
         </div>
       </BrowserRouter>
     );
